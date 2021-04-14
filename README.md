@@ -8,7 +8,7 @@ Wymagania:
 $ pip install antlr4-python3-runtime
 ```
 
-Uruchomienie:
+## Uruchomienie:
 
 Przekompilowanie gramatyki:
 ```
