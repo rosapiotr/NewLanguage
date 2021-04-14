@@ -9,6 +9,7 @@ $ pip install antlr4-python3-runtime
 ```
 
 Uruchomienie:
+
 Przekompilowanie gramatyki:
 ```
 $ antlr4 -Dlanguage=Python3 MyGrammar.g4
