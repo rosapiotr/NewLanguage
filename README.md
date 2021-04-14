@@ -1,6 +1,6 @@
 # Projekt polegający na stworzeniu własnego, prostego języka programowania.
 
-Wymagania:
+## Wymagania:
 * Python 3
 * llvm
 * antlr:
