@@ -153,7 +153,11 @@ class LangListenerImpl(LangListener):
         v_type = self.stack.pop()
 
         if id in self.variables.keys() and self.variables[id] != v_type:
-            self.error(ctx.start.line, "Redefinition of type of variable " + id)
+            if v_type == "ID":
+                if self.variables[id] != self.variables[v]:
+                    self.error(ctx.start.line, "Redefinition of type of variable " + id)
+            else:
+                self.error(ctx.start.line, "Redefinition of type of variable " + id)
         if "float" in self.operation_types:
             if id not in self.variables.keys():
                 self.variables[id] = "float"
