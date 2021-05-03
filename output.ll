@@ -8,13 +8,14 @@ declare i32 @__isoc99_scanf(i8*, ...)
 @.strsfn = private unnamed_addr constant [6 x i8] c"%[^\0A]\00", align 1
 @.str.1 = private unnamed_addr constant [15 x i8] c"a wieksze od 2\00", align 1
 @.str.2 = private unnamed_addr constant [15 x i8] c"a wieksze od 4\00", align 1
-@.str.3 = private unnamed_addr constant [2 x i8] c"A\00", align 1
-@.str.4 = private unnamed_addr constant [2 x i8] c"B\00", align 1
-@.str.5 = private unnamed_addr constant [2 x i8] c"C\00", align 1
-@.str.6 = private unnamed_addr constant [2 x i8] c"D\00", align 1
-@.str.7 = private unnamed_addr constant [9 x i8] c"IT WORKS\00", align 1
-@.str.8 = private unnamed_addr constant [6 x i8] c"FALSE\00", align 1
-@.str.9 = private unnamed_addr constant [5 x i8] c"TRUE\00", align 1
+@.str.3 = private unnamed_addr constant [17 x i8] c"a mniejsze od 10\00", align 1
+@.str.4 = private unnamed_addr constant [2 x i8] c"A\00", align 1
+@.str.5 = private unnamed_addr constant [2 x i8] c"B\00", align 1
+@.str.6 = private unnamed_addr constant [2 x i8] c"C\00", align 1
+@.str.7 = private unnamed_addr constant [2 x i8] c"D\00", align 1
+@.str.8 = private unnamed_addr constant [9 x i8] c"IT WORKS\00", align 1
+@.str.9 = private unnamed_addr constant [6 x i8] c"FALSE\00", align 1
+@.str.10 = private unnamed_addr constant [5 x i8] c"TRUE\00", align 1
 define i32 @main() #0{
 %a = alloca i32
 store i32 7, i32* %a
@@ -23,7 +24,7 @@ store i32 7, i32* %a
 store i32 2, i32* %2
 %3 = load i32, i32* %2
 %4 = icmp sgt i32 %1, %3
-br i1 %4, label %5, label %18
+br i1 %4, label %5, label %27
 ; <label>:5:
 %6 = alloca i8*, align 8
 store i8* getelementptr inbounds ([15 x i8], [15 x i8]* @.str.1, i32 0, i32 0), i8** %6, align 8
@@ -42,27 +43,27 @@ store i8* getelementptr inbounds ([15 x i8], [15 x i8]* @.str.2, i32 0, i32 0), 
 %16 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.strs, i32 0, i32 0), i8* %15)
 br label %17
 ; <label>:17:
-br label %18
-; <label>:18:
-store i32 12, i32* %a
-%19 = load i32, i32* %a
-%20 = alloca i32
-store i32 12, i32* %20
-%21 = load i32, i32* %20
-%22 = icmp sgt i32 %19, %21
-br i1 %22, label %23, label %27
-; <label>:23:
-%24 = alloca i8*, align 8
-store i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.3, i32 0, i32 0), i8** %24, align 8
-%25 = load i8*, i8** %24, align 8
-%26 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.strs, i32 0, i32 0), i8* %25)
+%18 = load i32, i32* %a
+%19 = alloca i32
+store i32 10, i32* %19
+%20 = load i32, i32* %19
+%21 = icmp slt i32 %18, %20
+br i1 %21, label %22, label %26
+; <label>:22:
+%23 = alloca i8*, align 8
+store i8* getelementptr inbounds ([17 x i8], [17 x i8]* @.str.3, i32 0, i32 0), i8** %23, align 8
+%24 = load i8*, i8** %23, align 8
+%25 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.strs, i32 0, i32 0), i8* %24)
+br label %26
+; <label>:26:
 br label %27
 ; <label>:27:
+store i32 12, i32* %a
 %28 = load i32, i32* %a
 %29 = alloca i32
 store i32 12, i32* %29
 %30 = load i32, i32* %29
-%31 = icmp sge i32 %28, %30
+%31 = icmp sgt i32 %28, %30
 br i1 %31, label %32, label %36
 ; <label>:32:
 %33 = alloca i8*, align 8
@@ -73,9 +74,9 @@ br label %36
 ; <label>:36:
 %37 = load i32, i32* %a
 %38 = alloca i32
-store i32 10, i32* %38
+store i32 12, i32* %38
 %39 = load i32, i32* %38
-%40 = icmp slt i32 %37, %39
+%40 = icmp sge i32 %37, %39
 br i1 %40, label %41, label %45
 ; <label>:41:
 %42 = alloca i8*, align 8
@@ -88,7 +89,7 @@ br label %45
 %47 = alloca i32
 store i32 10, i32* %47
 %48 = load i32, i32* %47
-%49 = icmp sgt i32 %46, %48
+%49 = icmp slt i32 %46, %48
 br i1 %49, label %50, label %54
 ; <label>:50:
 %51 = alloca i8*, align 8
@@ -97,51 +98,64 @@ store i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.6, i32 0, i32 0), i8
 %53 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.strs, i32 0, i32 0), i8* %52)
 br label %54
 ; <label>:54:
-store i32 1, i32* %a
 %55 = load i32, i32* %a
-%56 = alloca double
-store double 2.1, double* %56
-%57 = load double, double* %56
-%58 = sitofp i32 %55 to double
-%59 = fcmp olt double %58, %57
-br i1 %59, label %60, label %64
-; <label>:60:
-%61 = alloca i8*, align 8
-store i8* getelementptr inbounds ([9 x i8], [9 x i8]* @.str.7, i32 0, i32 0), i8** %61, align 8
-%62 = load i8*, i8** %61, align 8
-%63 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.strs, i32 0, i32 0), i8* %62)
-br label %64
-; <label>:64:
-%65 = alloca i32
-store i32 5, i32* %65
-%66 = load i32, i32* %65
-%67 = alloca double
-store double 5.1, double* %67
-%68 = load double, double* %67
-%69 = sitofp i32 %66 to double
-%70 = fcmp ogt double %69, %68
-br i1 %70, label %71, label %75
-; <label>:71:
-%72 = alloca i8*, align 8
-store i8* getelementptr inbounds ([6 x i8], [6 x i8]* @.str.8, i32 0, i32 0), i8** %72, align 8
-%73 = load i8*, i8** %72, align 8
-%74 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.strs, i32 0, i32 0), i8* %73)
-br label %75
-; <label>:75:
-%76 = alloca i32
-store i32 5, i32* %76
-%77 = load i32, i32* %76
-%78 = alloca double
-store double 5.1, double* %78
-%79 = load double, double* %78
-%80 = sitofp i32 %77 to double
-%81 = fcmp olt double %80, %79
-br i1 %81, label %82, label %86
-; <label>:82:
-%83 = alloca i8*, align 8
-store i8* getelementptr inbounds ([5 x i8], [5 x i8]* @.str.9, i32 0, i32 0), i8** %83, align 8
-%84 = load i8*, i8** %83, align 8
-%85 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.strs, i32 0, i32 0), i8* %84)
-br label %86
-; <label>:86:
+%56 = alloca i32
+store i32 10, i32* %56
+%57 = load i32, i32* %56
+%58 = icmp sgt i32 %55, %57
+br i1 %58, label %59, label %63
+; <label>:59:
+%60 = alloca i8*, align 8
+store i8* getelementptr inbounds ([2 x i8], [2 x i8]* @.str.7, i32 0, i32 0), i8** %60, align 8
+%61 = load i8*, i8** %60, align 8
+%62 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.strs, i32 0, i32 0), i8* %61)
+br label %63
+; <label>:63:
+store i32 1, i32* %a
+%64 = load i32, i32* %a
+%65 = alloca double
+store double 2.1, double* %65
+%66 = load double, double* %65
+%67 = sitofp i32 %64 to double
+%68 = fcmp olt double %67, %66
+br i1 %68, label %69, label %73
+; <label>:69:
+%70 = alloca i8*, align 8
+store i8* getelementptr inbounds ([9 x i8], [9 x i8]* @.str.8, i32 0, i32 0), i8** %70, align 8
+%71 = load i8*, i8** %70, align 8
+%72 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.strs, i32 0, i32 0), i8* %71)
+br label %73
+; <label>:73:
+%74 = alloca i32
+store i32 5, i32* %74
+%75 = load i32, i32* %74
+%76 = alloca double
+store double 5.1, double* %76
+%77 = load double, double* %76
+%78 = sitofp i32 %75 to double
+%79 = fcmp ogt double %78, %77
+br i1 %79, label %80, label %84
+; <label>:80:
+%81 = alloca i8*, align 8
+store i8* getelementptr inbounds ([6 x i8], [6 x i8]* @.str.9, i32 0, i32 0), i8** %81, align 8
+%82 = load i8*, i8** %81, align 8
+%83 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.strs, i32 0, i32 0), i8* %82)
+br label %84
+; <label>:84:
+%85 = alloca i32
+store i32 5, i32* %85
+%86 = load i32, i32* %85
+%87 = alloca double
+store double 5.1, double* %87
+%88 = load double, double* %87
+%89 = sitofp i32 %86 to double
+%90 = fcmp olt double %89, %88
+br i1 %90, label %91, label %95
+; <label>:91:
+%92 = alloca i8*, align 8
+store i8* getelementptr inbounds ([5 x i8], [5 x i8]* @.str.10, i32 0, i32 0), i8** %92, align 8
+%93 = load i8*, i8** %92, align 8
+%94 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.strs, i32 0, i32 0), i8* %93)
+br label %95
+; <label>:95:
 ret i32 0 }

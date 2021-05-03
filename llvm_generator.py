@@ -4,8 +4,7 @@ class LLVMGenerator:
     reg = 1
     constants = 1
     constant_type = dict()
-    depth = 0
-    last_depth = 0
+    if_levels = []
 
     def __init__(self):
         pass
@@ -190,21 +189,17 @@ class LLVMGenerator:
             LLVMGenerator.reg += 1
 
     def begin_br(result):
+        LLVMGenerator.if_levels.append(len(LLVMGenerator.main_text) - 1)
         LLVMGenerator.main_text[-1] += "br i1 " + result + ", label %" + str(LLVMGenerator.reg) + ", " 
         LLVMGenerator.main_text.append("")
         LLVMGenerator.main_text[-1] += "; <label>:" + str(LLVMGenerator.reg) + ":\n"
         LLVMGenerator.reg += 1
-        LLVMGenerator.depth += 1
 
     def end_br():
-        LLVMGenerator.depth -= 1
-        LLVMGenerator.main_text[LLVMGenerator.depth] += "label %" + str(LLVMGenerator.reg) + "\n"
+        LLVMGenerator.main_text[LLVMGenerator.if_levels.pop()] += "label %" + str(LLVMGenerator.reg) + "\n"
         LLVMGenerator.main_text[-1] += "br label %" + str(LLVMGenerator.reg) + "\n"
         LLVMGenerator.main_text[-1] += "; <label>:" + str(LLVMGenerator.reg) + ":\n"
         LLVMGenerator.reg += 1
-        if LLVMGenerator.depth == LLVMGenerator.last_depth:
-            LLVMGenerator.last_depth = len(LLVMGenerator.main_text) - 1
-            LLVMGenerator.depth = len(LLVMGenerator.main_text) - 1
 
     def generate():
         text = "";

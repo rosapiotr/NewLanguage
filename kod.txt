@@ -42,6 +42,9 @@ if(a > 2){
     if(a > 4){
         write("a wieksze od 4")
     }
+    if(a < 10){
+        write("a mniejsze od 10")
+    }
 }
 
 
