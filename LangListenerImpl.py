@@ -31,9 +31,6 @@ class LangListenerImpl(LangListener):
                 LLVMGenerator.declare_i32(id)
             elif typ == "str":
                 typ = "strs"
-                # TODO scanf musi miec np char string[200]; wtedy zmieni się też deklaracja zmiennej przechowujacej go (alloca)
-                # LLVMGenerator.declare_string(id)
-                pass
             self.variables[id] = typ
         LLVMGenerator.read_value(id, typ)
 
@@ -187,6 +184,68 @@ class LangListenerImpl(LangListener):
             else:
                 LLVMGenerator.assign_string(id, v)
         self.operation_types = []
+
+    def enterIfExpr(self, ctx:LangParser.IfExprContext):
+        left = "%" + str(LLVMGenerator.reg)
+        right = "%" + str(LLVMGenerator.reg + 1)
+        left_type = None
+        right_type = None
+        if ctx.left.number() is not None:
+            if ctx.left.number().INT() is not None:
+                left_type = "int"
+                LLVMGenerator.declare_assign_i32(ctx.left.number().INT().getText())
+            elif ctx.left.number().REAL() is not None:
+                left_type = "float"
+                LLVMGenerator.declare_assign_float(ctx.left.number().REAL().getText())
+            left = "%" + str(LLVMGenerator.reg)
+            LLVMGenerator.withdraw_last(left_type)
+        elif ctx.left.ID() is not None:
+            id = ctx.left.ID().getText()
+            if id not in self.variables.keys():
+                self.error(ctx.start.line, "Variable has not been declared: " + id)
+            left_type = self.variables[id]
+            LLVMGenerator.withdraw_id(id, self.variables[id])
+        elif ctx.right.STRING() is not None:
+            self.error("String comparison not allowed")
+
+        if ctx.right.number() is not None:
+            if ctx.right.number().INT() is not None:
+                right_type = "int"
+                LLVMGenerator.declare_assign_i32(ctx.right.number().INT().getText())
+            elif ctx.right.number().REAL() is not None:
+                right_type = "float"
+                LLVMGenerator.declare_assign_float(ctx.right.number().REAL().getText())
+            right = "%" + str(LLVMGenerator.reg)
+            LLVMGenerator.withdraw_last(right_type)
+        elif ctx.right.ID() is not None:
+            id = ctx.right.ID().getText()
+            if id not in self.variables.keys():
+                self.error(ctx.start.line, "Variable has not been declared: " + id)
+            right_type = self.variables[id]
+            LLVMGenerator.withdraw_id(id, self.variables[id])
+        elif ctx.right.STRING() is not None:
+            self.error("String comparison not allowed")
+
+        sgn = ctx.comp().getText()
+        if left_type == "int" and right_type == "int":
+            LLVMGenerator.compare_int(left, right, sgn)
+        elif left_type == "float" and right_type == "float":
+            LLVMGenerator.compare_float(left, right, sgn)
+        elif left_type == "float" and right_type == "int":
+            LLVMGenerator.convert_val_to_float(right)
+            right = "%" + str(LLVMGenerator.reg - 1)
+            LLVMGenerator.compare_float(left, right, sgn)
+        elif left_type == "int" and right_type == "float":
+            LLVMGenerator.convert_val_to_float(left)
+            left = "%" + str(LLVMGenerator.reg - 1)
+            LLVMGenerator.compare_float(left, right, sgn)
+        
+        res = "%" + str(LLVMGenerator.reg - 1)
+        LLVMGenerator.begin_br(res)
+
+
+    def exitIfExpr(self, ctx:LangParser.IfExprContext):
+        LLVMGenerator.end_br() # TODO
 
     def exitProg(self, ctx:LangParser.ProgContext):
         with open("output.ll", "w") as f:

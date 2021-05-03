@@ -6,6 +6,7 @@ expr
    |   write
    |   read
    |   assign
+   |   ifExpr
    ;
 
 operation
@@ -42,6 +43,37 @@ assign
 number
    :   INT
    |   REAL
+   ;
+
+ifExpr
+   :   IF left=value comp right=value ')' '{' (expr? NEWLINE)* '}'
+   ;
+
+IF:   'if('
+   ;
+
+comp
+   :   GE
+   |   LE
+   |   GT
+   |   LT
+   |   EQ
+   ;   
+
+GE:   '>='
+   ;
+
+LE:   '<='
+   ;
+
+GT:   '>'
+   ;
+
+LT:   '<'
+   ;
+
+EQ:
+   '=='
    ;
 
 INTEGER:   'int'

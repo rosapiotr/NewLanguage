@@ -107,5 +107,23 @@ class LangListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by LangParser#ifExpr.
+    def enterIfExpr(self, ctx:LangParser.IfExprContext):
+        pass
+
+    # Exit a parse tree produced by LangParser#ifExpr.
+    def exitIfExpr(self, ctx:LangParser.IfExprContext):
+        pass
+
+
+    # Enter a parse tree produced by LangParser#comp.
+    def enterComp(self, ctx:LangParser.CompContext):
+        pass
+
+    # Exit a parse tree produced by LangParser#comp.
+    def exitComp(self, ctx:LangParser.CompContext):
+        pass
+
+
 
 del LangParser

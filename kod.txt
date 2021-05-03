@@ -34,3 +34,41 @@ a = read(str)
 write(a)
 b = "testowy string"
 write(b)
+
+
+a = 7
+if(a > 2){
+    write("a wieksze od 2")
+    if(a > 4){
+        write("a wieksze od 4")
+    }
+}
+
+
+a = 12
+if(a > 12) {
+    write("A")
+}
+if(a >= 12) {
+    write("B")
+}
+if(a < 10) {
+    write("C")
+}
+if(a > 10) {
+    write("D")
+}
+
+
+a = 1
+if(a < 2.1) {
+    write("IT WORKS")
+}
+
+
+if(5 > 5.1) {
+    write("FALSE")
+}
+if(5 < 5.1) {
+    write("TRUE")
+}
