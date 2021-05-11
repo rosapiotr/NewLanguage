@@ -134,6 +134,15 @@ class LangListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by LangParser#functionCall.
+    def enterFunctionCall(self, ctx:LangParser.FunctionCallContext):
+        pass
+
+    # Exit a parse tree produced by LangParser#functionCall.
+    def exitFunctionCall(self, ctx:LangParser.FunctionCallContext):
+        pass
+
+
     # Enter a parse tree produced by LangParser#comp.
     def enterComp(self, ctx:LangParser.CompContext):
         pass

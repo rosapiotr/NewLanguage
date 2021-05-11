@@ -14,6 +14,7 @@ class LangListenerImpl(LangListener):
         self.stack = []
         self.operation_types = []
         self.functions = dict()
+        self.tmp_variables = dict()
 
     def error(self, line, message):
        print("Error, line " + str(line) + ", " + message)
@@ -207,7 +208,7 @@ class LangListenerImpl(LangListener):
             left_type = self.variables[id]
             LLVMGenerator.withdraw_id(id, self.variables[id])
         elif ctx.right.STRING() is not None:
-            self.error("String comparison not allowed")
+            self.error(ctx.start.line, "String comparison not allowed")
 
         if ctx.right.number() is not None:
             if ctx.right.number().INT() is not None:
@@ -225,7 +226,7 @@ class LangListenerImpl(LangListener):
             right_type = self.variables[id]
             LLVMGenerator.withdraw_id(id, self.variables[id])
         elif ctx.right.STRING() is not None:
-            self.error("String comparison not allowed")
+            self.error(ctx.start.line, "String comparison not allowed")
 
         sgn = ctx.comp().getText()
         if left_type == "int" and right_type == "int":
@@ -253,7 +254,6 @@ class LangListenerImpl(LangListener):
         left_type = None
         right_type = None
         left_id = None
-        print(ctx.left.text)
         
         left_id = ctx.left.text
         if left_id not in self.variables.keys():
@@ -282,7 +282,7 @@ class LangListenerImpl(LangListener):
             right_type = self.variables[id]
             LLVMGenerator.withdraw_id(id, self.variables[id])
         elif ctx.right.STRING() is not None:
-            self.error("String comparison not allowed")
+            self.error(ctx.start.line, "String comparison not allowed")
 
         LLVMGenerator.openWhile()
         LLVMGenerator.withdraw_id(left_id, self.variables[left_id])
@@ -307,21 +307,31 @@ class LangListenerImpl(LangListener):
     def exitWhileExpr(self, ctx:LangParser.WhileExprContext):
         LLVMGenerator.end_br(True)
 
-    def enterFunction(self, ctx:LangParser.FunctionContext):  ## TODO how do I write function code inside it's block
-        print(ctx.fname.text)
+    def enterFunction(self, ctx:LangParser.FunctionContext):
+        fname = ctx.fname.text
+        if fname in self.functions.keys():
+            self.error(ctx.start.line, "Invalid redefinition of function " + fname)
+        self.tmp_variables = self.variables
+        self.variables = dict()
         if ctx.params is not None:
-            self.functions[ctx.fname.text] = 1
+            self.functions[fname] = 1
         else:
-            self.functions[ctx.fname.text] = 0 # TODO
-            LLVMGenerator.declare_function(ctx.fname.text)  # TODO kwargs
+            self.functions[fname] = 0 # TODO
+            LLVMGenerator.declare_function(fname)  # TODO kwargs
 
     def exitFunction(self, ctx:LangParser.FunctionContext):
-        # self.function_name = None
+        self.variables = self.tmp_variables
         LLVMGenerator.close_function()
     
-    #TODO function call
-    # TODO variables inside functions should not be checked for type
-    
+    def enterFunctionCall(self, ctx:LangParser.FunctionCallContext):
+        fname = ctx.fname.text
+        if fname not in self.functions.keys():
+            self.error(ctx.start.line, "Function " + fname + " does not exist")
+        LLVMGenerator.call_function(fname)
+            
+    # TODO functions to return value
+    # TODO functions with parameters 
+
     def exitProg(self, ctx:LangParser.ProgContext):
         with open("output.ll", "w") as f:
             f.write(LLVMGenerator.generate())

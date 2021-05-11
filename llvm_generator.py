@@ -216,22 +216,25 @@ class LLVMGenerator:
         LLVMGenerator.reg += 1
         
     def declare_function(fname):
+        LLVMGenerator.main_text.append("")
         LLVMGenerator.function_start = len(LLVMGenerator.main_text) - 1
-        LLVMGenerator.functions.append("") 
-        LLVMGenerator.functions[-1] += "define i32 @" + fname + "() #0 {\n"
+        LLVMGenerator.functions.append("")
+        # LLVMGenerator.functions[-1] += "define i32 @" + fname + "() #0 {\n"
+        LLVMGenerator.functions[-1] += "define void @" + fname + "() #0 {\n"
         LLVMGenerator.tmp_reg = LLVMGenerator.reg
         LLVMGenerator.reg = 1
 
     def close_function():
         for function_text in LLVMGenerator.main_text[LLVMGenerator.function_start:]:
             LLVMGenerator.functions[-1] += function_text
-        # for _ in range(len(LLVMGenerator.main_text) - LLVMGenerator.function_start):
-        #     LLVMGenerator.main_text.pop()
         del LLVMGenerator.main_text[LLVMGenerator.function_start:]
         LLVMGenerator.main_text.append("")
-        # LLVMGenerator.main_text.pop()
-        LLVMGenerator.functions[-1] += "ret i32 0 }\n\n";
+        # LLVMGenerator.functions[-1] += "ret i32 0 }\n\n";
+        LLVMGenerator.functions[-1] += "ret void \n}\n\n";
         LLVMGenerator.reg = LLVMGenerator.tmp_reg
+    
+    def call_function(fname):
+        LLVMGenerator.main_text[-1] += "call void @" + fname + "()\n"
 
     def generate():
         text = "";

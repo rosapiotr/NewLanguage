@@ -75,14 +75,6 @@ if(a < b) {
     write("Comparison of INT and FLOAT variables works")
 }
 
-if(5 > 5.1) {
-    write("FALSE")
-}
-if(5 < 5.1) {
-    write("TRUE")
-}
-
-
 
 a = 1
 while(a < 10) {
@@ -106,14 +98,30 @@ while(a < 22.22) {
 function test() {
     write("a")
 }
+test()
 
-function test(a b c) {
-    write("a")
-}
 
 function test() {
     a = 1
-    while(a < 10) {
-        write(a)
+    if(a < 5) {
+        while(a < 10) {
+            write(a)
+            a = a + 1
+        }
     }
+}
+test()
+
+
+a = 1
+function test() {
+    a = "test"
+    write(a)
+}
+test()
+write(a)
+
+
+function test(a b c) {
+    write("a")
 }

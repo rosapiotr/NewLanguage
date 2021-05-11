@@ -1,5 +1,5 @@
 grammar Lang;
-prog:   ((expr|function)? NEWLINE)* EOF    
+prog:   ((expr|function|functionCall)? NEWLINE)* EOF    
     ;
 expr
    :   operation
@@ -54,10 +54,15 @@ whileExpr
    :   WHILE left=ID comp right=value ')' '{' (expr? NEWLINE)* '}'
    ;
 
-function: FUNCTION fname=ID '(' params=ID* ')' '{' (expr? NEWLINE)* '}'
+function
+   :   FUNCTION fname=ID '(' params=ID* ')' '{' (expr? NEWLINE)* '}'
    ;
 
 FUNCTION:   'function'
+   ;
+
+functionCall
+   :   fname=ID '(' params=ID* ')'
    ;
 
 IF:   'if('
