@@ -13,6 +13,7 @@ class LangListenerImpl(LangListener):
         self.variables = dict()
         self.stack = []
         self.operation_types = []
+        self.functions = dict()
 
     def error(self, line, message):
        print("Error, line " + str(line) + ", " + message)
@@ -245,8 +246,75 @@ class LangListenerImpl(LangListener):
 
 
     def exitIfExpr(self, ctx:LangParser.IfExprContext):
-        LLVMGenerator.end_br() # TODO
+        LLVMGenerator.end_br(False) # TODO
 
+    def enterWhileExpr(self, ctx:LangParser.WhileExprContext):
+        right = "%" + str(LLVMGenerator.reg)
+        left_type = None
+        right_type = None
+        left_id = None
+        
+        if ctx.left.ID() is not None:
+            left_id = ctx.left.ID().getText()
+            if left_id not in self.variables.keys():
+                self.error(ctx.start.line, "Variable has not been declared: " + left_id)
+            left_type = self.variables[left_id]
+
+        if ctx.right.number() is not None:
+            if ctx.right.number().INT() is not None:
+                right_type = "int"
+                LLVMGenerator.declare_assign_i32(ctx.right.number().INT().getText())
+            elif ctx.right.number().REAL() is not None:
+                right_type = "float"
+                LLVMGenerator.declare_assign_float(ctx.right.number().REAL().getText())
+            right = "%" + str(LLVMGenerator.reg)
+            LLVMGenerator.withdraw_last(right_type)
+        elif ctx.right.ID() is not None:
+            id = ctx.right.ID().getText()
+            if id not in self.variables.keys():
+                self.error(ctx.start.line, "Variable has not been declared: " + id)
+            right_type = self.variables[id]
+            LLVMGenerator.withdraw_id(id, self.variables[id])
+        elif ctx.right.STRING() is not None:
+            self.error("String comparison not allowed")
+
+        LLVMGenerator.openWhile()
+        LLVMGenerator.withdraw_id(left_id, self.variables[left_id])
+        left = "%" + str(LLVMGenerator.reg-1)
+
+        sgn = ctx.comp().getText()
+        if left_type == "int" and right_type == "int":
+            LLVMGenerator.compare_int(left, right, sgn)
+        elif left_type == "float" and right_type == "float":
+            LLVMGenerator.compare_float(left, right, sgn)
+        elif left_type == "float" and right_type == "int":
+            LLVMGenerator.convert_val_to_float(right)
+            right = "%" + str(LLVMGenerator.reg - 1)
+            LLVMGenerator.compare_float(left, right, sgn)
+        elif left_type == "int" and right_type == "float":
+            LLVMGenerator.convert_val_to_float(left)
+            left = "%" + str(LLVMGenerator.reg - 1)
+            LLVMGenerator.compare_float(left, right, sgn)
+        res = "%" + str(LLVMGenerator.reg - 1)
+        LLVMGenerator.begin_br(res)
+
+    def exitWhileExpr(self, ctx:LangParser.WhileExprContext):
+        LLVMGenerator.end_br(True)
+
+    def enterFunction(self, ctx:LangParser.FunctionContext):  ## TODO how do I write function code inside it's block
+        print(ctx.fname.text)
+        if ctx.params is not None:
+            self.functions[ctx.fname.text] = 1
+        else:
+            self.functions[ctx.fname.text] = 0 # TODO
+            LLVMGenerator.declare_function(ctx.fname.text)  # TODO kwargs
+
+    def exitFunction(self, ctx:LangParser.FunctionContext):
+        # self.function_name = None
+        LLVMGenerator.close_function()
+    
+    #TODO function call
+    
     def exitProg(self, ctx:LangParser.ProgContext):
         with open("output.ll", "w") as f:
             f.write(LLVMGenerator.generate())

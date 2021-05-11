@@ -1,10 +1,12 @@
 class LLVMGenerator:
     header_text = ""
     main_text = [""]
+    functions = []
     reg = 1
     constants = 1
     constant_type = dict()
-    if_levels = []
+    callback_levels = []
+    while_openings = []
 
     def __init__(self):
         pass
@@ -189,17 +191,33 @@ class LLVMGenerator:
             LLVMGenerator.reg += 1
 
     def begin_br(result):
-        LLVMGenerator.if_levels.append(len(LLVMGenerator.main_text) - 1)
+        LLVMGenerator.callback_levels.append(len(LLVMGenerator.main_text) - 1)
         LLVMGenerator.main_text[-1] += "br i1 " + result + ", label %" + str(LLVMGenerator.reg) + ", " 
         LLVMGenerator.main_text.append("")
         LLVMGenerator.main_text[-1] += "; <label>:" + str(LLVMGenerator.reg) + ":\n"
         LLVMGenerator.reg += 1
 
-    def end_br():
-        LLVMGenerator.main_text[LLVMGenerator.if_levels.pop()] += "label %" + str(LLVMGenerator.reg) + "\n"
-        LLVMGenerator.main_text[-1] += "br label %" + str(LLVMGenerator.reg) + "\n"
+    def end_br(isWhile):
+        LLVMGenerator.main_text[LLVMGenerator.callback_levels.pop()] += "label %" + str(LLVMGenerator.reg) + "\n\n"
+        if isWhile:
+            LLVMGenerator.main_text[-1] += "br label %" + str(LLVMGenerator.while_openings.pop()) + "\n\n"
+        else:
+            LLVMGenerator.main_text[-1] += "br label %" + str(LLVMGenerator.reg) + "\n\n"
         LLVMGenerator.main_text[-1] += "; <label>:" + str(LLVMGenerator.reg) + ":\n"
         LLVMGenerator.reg += 1
+
+    def openWhile():
+        LLVMGenerator.main_text[-1] += "br label %" + str(LLVMGenerator.reg) + "\n\n"
+        LLVMGenerator.main_text[-1] += "; <label>:" + str(LLVMGenerator.reg) + ":\n"
+        LLVMGenerator.while_openings.append(LLVMGenerator.reg)
+        LLVMGenerator.reg += 1
+        
+    def declare_function(fname):
+        LLVMGenerator.functions.append("") 
+        LLVMGenerator.functions[-1] += "define i32 @" + fname + "() #0 {\n"
+
+    def close_function():
+        LLVMGenerator.functions[-1] += '}\n\n'
 
     def generate():
         text = "";
@@ -211,7 +229,10 @@ class LLVMGenerator:
         text += "@.strs = private unnamed_addr constant [4 x i8] c\"%s\\0A\\00\", align 1\n"
         text += "@.strsf = private unnamed_addr constant [3 x i8] c\"%s\\00\", align 1\n"
         text += "@.strsfn = private unnamed_addr constant [6 x i8] c\"%[^\\0A]\\00\", align 1\n"
-        text += LLVMGenerator.header_text;
+        text += LLVMGenerator.header_text + "\n";
+        for fnc in LLVMGenerator.functions:
+            text += fnc;
+        text += "ret i32 0 }\n";
         text += "define i32 @main() #0{\n";
         for mt in LLVMGenerator.main_text:
             text += mt;

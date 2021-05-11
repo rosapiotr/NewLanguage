@@ -75,3 +75,32 @@ if(5 > 5.1) {
 if(5 < 5.1) {
     write("TRUE")
 }
+
+
+
+a = 1
+while(a < 10) {
+    write(a)
+    a = a + 1
+}
+
+
+a = 11.11  
+while(a < 22.22) {
+    b = 1
+    while(b < 5) {
+        write(b)
+        b = b + 1
+    }
+    write(a)
+    a = a + 1.11
+}
+
+
+function test() {
+    write("a")
+}
+
+function test(a b c) {
+    write("a")
+}

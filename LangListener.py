@@ -116,6 +116,24 @@ class LangListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by LangParser#whileExpr.
+    def enterWhileExpr(self, ctx:LangParser.WhileExprContext):
+        pass
+
+    # Exit a parse tree produced by LangParser#whileExpr.
+    def exitWhileExpr(self, ctx:LangParser.WhileExprContext):
+        pass
+
+
+    # Enter a parse tree produced by LangParser#function.
+    def enterFunction(self, ctx:LangParser.FunctionContext):
+        pass
+
+    # Exit a parse tree produced by LangParser#function.
+    def exitFunction(self, ctx:LangParser.FunctionContext):
+        pass
+
+
     # Enter a parse tree produced by LangParser#comp.
     def enterComp(self, ctx:LangParser.CompContext):
         pass
