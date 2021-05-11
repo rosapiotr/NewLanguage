@@ -8,6 +8,9 @@ class LLVMGenerator:
     callback_levels = []
     while_openings = []
 
+    tmp_reg = 1
+    function_start = 0
+
     def __init__(self):
         pass
     
@@ -213,11 +216,22 @@ class LLVMGenerator:
         LLVMGenerator.reg += 1
         
     def declare_function(fname):
+        LLVMGenerator.function_start = len(LLVMGenerator.main_text) - 1
         LLVMGenerator.functions.append("") 
         LLVMGenerator.functions[-1] += "define i32 @" + fname + "() #0 {\n"
+        LLVMGenerator.tmp_reg = LLVMGenerator.reg
+        LLVMGenerator.reg = 1
 
     def close_function():
-        LLVMGenerator.functions[-1] += '}\n\n'
+        for function_text in LLVMGenerator.main_text[LLVMGenerator.function_start:]:
+            LLVMGenerator.functions[-1] += function_text
+        # for _ in range(len(LLVMGenerator.main_text) - LLVMGenerator.function_start):
+        #     LLVMGenerator.main_text.pop()
+        del LLVMGenerator.main_text[LLVMGenerator.function_start:]
+        LLVMGenerator.main_text.append("")
+        # LLVMGenerator.main_text.pop()
+        LLVMGenerator.functions[-1] += "ret i32 0 }\n\n";
+        LLVMGenerator.reg = LLVMGenerator.tmp_reg
 
     def generate():
         text = "";
@@ -232,7 +246,6 @@ class LLVMGenerator:
         text += LLVMGenerator.header_text + "\n";
         for fnc in LLVMGenerator.functions:
             text += fnc;
-        text += "ret i32 0 }\n";
         text += "define i32 @main() #0{\n";
         for mt in LLVMGenerator.main_text:
             text += mt;

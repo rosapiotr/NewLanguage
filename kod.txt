@@ -63,11 +63,17 @@ if(a > 10) {
 }
 
 
+if(100 < 100.1) {
+    write("Comparison of INT and FLOAT works")
+}
 a = 1
 if(a < 2.1) {
-    write("IT WORKS")
+    write("Comparison of INT variable and FLOAT works")
 }
-
+b = 1.1
+if(a < b) {
+    write("Comparison of INT and FLOAT variables works")
+}
 
 if(5 > 5.1) {
     write("FALSE")
@@ -103,4 +109,11 @@ function test() {
 
 function test(a b c) {
     write("a")
+}
+
+function test() {
+    a = 1
+    while(a < 10) {
+        write(a)
+    }
 }

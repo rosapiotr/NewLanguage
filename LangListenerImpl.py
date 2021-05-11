@@ -253,12 +253,18 @@ class LangListenerImpl(LangListener):
         left_type = None
         right_type = None
         left_id = None
+        print(ctx.left.text)
         
-        if ctx.left.ID() is not None:
-            left_id = ctx.left.ID().getText()
-            if left_id not in self.variables.keys():
-                self.error(ctx.start.line, "Variable has not been declared: " + left_id)
-            left_type = self.variables[left_id]
+        left_id = ctx.left.text
+        if left_id not in self.variables.keys():
+            self.error(ctx.start.line, "Variable has not been declared: " + left_id)
+        left_type = self.variables[left_id]
+
+        # if ctx.left.ID() is not None:
+        #     left_id = ctx.left.ID().getText()
+        #     if left_id not in self.variables.keys():
+        #         self.error(ctx.start.line, "Variable has not been declared: " + left_id)
+        #     left_type = self.variables[left_id]
 
         if ctx.right.number() is not None:
             if ctx.right.number().INT() is not None:
@@ -314,6 +320,7 @@ class LangListenerImpl(LangListener):
         LLVMGenerator.close_function()
     
     #TODO function call
+    # TODO variables inside functions should not be checked for type
     
     def exitProg(self, ctx:LangParser.ProgContext):
         with open("output.ll", "w") as f:
