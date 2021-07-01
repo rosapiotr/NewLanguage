@@ -55,14 +55,22 @@ whileExpr
    ;
 
 function
-   :   FUNCTION fname=ID '(' params=ID* ')' '{' (expr? NEWLINE)* '}'
+   :   FUNCTION fname=ID '(' params=functionparam? ')' '{' (expr? NEWLINE)* '}'
    ;
 
 FUNCTION:   'function'
    ;
 
+functionparam
+   :   (typ ID ',')* typ ID
+   ;
+
 functionCall
-   :   fname=ID '(' params=ID* ')'
+   :   fname=ID '(' params=functioncallparam? ')'
+   ;
+
+functioncallparam
+   :   (value ',')* value
    ;
 
 IF:   'if('

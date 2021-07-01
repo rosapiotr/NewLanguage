@@ -57,6 +57,9 @@ class LLVMGenerator:
         LLVMGenerator.header_text += "@.str." + str(LLVMGenerator.constants) + " = private unnamed_addr constant [" + str(len(value) + 1) + " x i8] c\"" + value + "\\00\", align 1\n"
         LLVMGenerator.main_text[-1] += "store i8* getelementptr inbounds ([" + str(len(value) + 1) + " x i8], [" + str(len(value) + 1) + " x i8]* @.str." + str(LLVMGenerator.constants) + ", i32 0, i32 0), i8** %" + id + ", align 8\n"
         LLVMGenerator.constants += 1
+        
+    def store_string(id, value):
+        LLVMGenerator.main_text[-1] += "store i8* %" + value + ", i8** %" + id + ", align 8\n"
 
     def add_i32(val1, val2):
         LLVMGenerator.main_text[-1] += "%" + str(LLVMGenerator.reg) + " = add nsw i32 " + val1 + ", " + val2 + "\n";
@@ -140,7 +143,7 @@ class LLVMGenerator:
             LLVMGenerator.main_text[-1] += "%" + str(LLVMGenerator.reg) + " = load double, double* %" + id + "\n"
             LLVMGenerator.reg += 1
         elif typ == "str":
-            LLVMGenerator.main_text[-1] += "%" + str(LLVMGenerator.reg) + " = load i8*, i8** %1, align 8\n"
+            LLVMGenerator.main_text[-1] += "%" + str(LLVMGenerator.reg) + " = load i8*, i8** %" + id + ", align 8\n"
             LLVMGenerator.reg += 1
 
     def convert_to_float():
@@ -223,6 +226,33 @@ class LLVMGenerator:
         LLVMGenerator.functions[-1] += "define void @" + fname + "() #0 {\n"
         LLVMGenerator.tmp_reg = LLVMGenerator.reg
         LLVMGenerator.reg = 1
+    
+    def declare_function_params(fname, params, types):
+        LLVMGenerator.main_text.append("")
+        LLVMGenerator.function_start = len(LLVMGenerator.main_text) - 1
+        LLVMGenerator.functions.append("")
+        LLVMGenerator.functions[-1] += "define void @" + fname + "("
+        for i in range(0, len(types)):
+            if types[i] == "int":
+                LLVMGenerator.functions[-1] += "i32"
+            elif types[i] == "float":
+                LLVMGenerator.functions[-1] += "double"
+            elif types[i] == "str":
+                LLVMGenerator.functions[-1] += "i8*"
+            if i != len(types)-1:
+                LLVMGenerator.functions[-1] += ", "
+        LLVMGenerator.functions[-1] += ") #0 {\n"
+        for i, param_typ in enumerate(zip(params, types)):
+            if param_typ[1] == "int":
+                LLVMGenerator.declare_i32(param_typ[0])
+                LLVMGenerator.assign_i32(param_typ[0], "%" + str(i))
+            elif param_typ[1] == "float":
+                LLVMGenerator.declare_float(param_typ[0])
+                LLVMGenerator.assign_float(param_typ[0], "%" + str(i))
+            elif param_typ[1] == "str":
+                LLVMGenerator.declare_string(param_typ[0])
+                LLVMGenerator.store_string(param_typ[0], str(i))
+        LLVMGenerator.reg += len(params)
 
     def close_function():
         for function_text in LLVMGenerator.main_text[LLVMGenerator.function_start:]:
@@ -235,6 +265,39 @@ class LLVMGenerator:
     
     def call_function(fname):
         LLVMGenerator.main_text[-1] += "call void @" + fname + "()\n"
+
+    def call_function_params(fname, params, types):
+        params_dict = dict()
+        for param, typ in zip(params, types):
+            if param[0] == "%":
+                LLVMGenerator.withdraw_id(param[1:], typ)
+                params_dict[param] = "%" + str(LLVMGenerator.reg-1)
+
+        LLVMGenerator.main_text[-1] += "call void @" + fname + "("
+        for i, param_typ in enumerate(zip(params, types)):
+            if param_typ[1] == "int":
+                if param_typ[0][0] == "%":
+                    LLVMGenerator.main_text[-1] += "i32 " + params_dict[param_typ[0]]
+                else:
+                    LLVMGenerator.main_text[-1] += "i32 " + param_typ[0]
+            elif param_typ[1] == "float":
+                if param_typ[0][0] == "%":
+                    LLVMGenerator.main_text[-1] += "double " + params_dict[param_typ[0]]
+                else:
+                    LLVMGenerator.main_text[-1] += "double " + param_typ[0]
+            elif param_typ[1] == "str":
+                if param_typ[0][0] == "%":
+                    LLVMGenerator.main_text[-1] += "i8* " + params_dict[param_typ[0]]
+                else:
+                    LLVMGenerator.declare_get_string(param_typ[0])
+            if i != len(types)-1:
+                LLVMGenerator.main_text[-1] += ", "
+        LLVMGenerator.main_text[-1] += ")\n"
+
+    def declare_get_string(value):
+        LLVMGenerator.header_text += "@.str." + str(LLVMGenerator.constants) + " = private unnamed_addr constant [" + str(len(value) + 1) + " x i8] c\"" + value + "\\00\", align 1\n"
+        LLVMGenerator.main_text[-1] += "i8* getelementptr inbounds ([" + str(len(value) + 1) + " x i8], [" + str(len(value) + 1) + " x i8]* @.str." + str(LLVMGenerator.constants) + ", i32 0, i32 0)"
+        LLVMGenerator.constants += 1
 
     def generate():
         text = "";

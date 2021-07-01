@@ -61,6 +61,9 @@ if(a < 10) {
 if(a > 10) {
     write("D")
 }
+if(a == 12) {
+    write("A == 12")
+}
 
 
 if(100 < 100.1) {
@@ -121,7 +124,39 @@ function test() {
 test()
 write(a)
 
-
-function test(a b c) {
-    write("a")
+a = 12
+function test(int a, int b) { 
+        write(a)
+        write(b)
 }
+test(a, 42)
+
+
+a = 123
+function test(int a, int b) { 
+        c = a * b
+        d = c * 10
+        write(d)
+}
+test(a, 42)
+
+a = "testtest"
+function test(str a) {
+        write(a)
+}
+test(a)
+
+
+function test(str a) {
+        write(a)
+}
+test("testtest")
+
+
+function test(str a, int b, double c) {
+        write(a)
+        write(b)
+        write(c)
+        write(b * c + 1)
+}
+test("testtest", 1, 2.0)

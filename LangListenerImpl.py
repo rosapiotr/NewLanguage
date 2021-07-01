@@ -313,8 +313,18 @@ class LangListenerImpl(LangListener):
             self.error(ctx.start.line, "Invalid redefinition of function " + fname)
         self.tmp_variables = self.variables
         self.variables = dict()
+        params = []
+        types = []
         if ctx.params is not None:
-            self.functions[fname] = 1
+            for param, typ in zip(ctx.params.ID(), ctx.params.typ()):
+                params.append(param.getText())
+                temp_typ = typ.getText()
+                if temp_typ == "double":
+                    temp_typ = "float"
+                self.variables[param.getText()] = temp_typ
+                types.append(temp_typ)
+            LLVMGenerator.declare_function_params(fname, params, types)  # TODO kwargs
+            self.functions[fname] = types
         else:
             self.functions[fname] = 0 # TODO
             LLVMGenerator.declare_function(fname)  # TODO kwargs
@@ -324,13 +334,32 @@ class LangListenerImpl(LangListener):
         LLVMGenerator.close_function()
     
     def enterFunctionCall(self, ctx:LangParser.FunctionCallContext):
+        # TODO check whether types declared and types called are the same
         fname = ctx.fname.text
         if fname not in self.functions.keys():
             self.error(ctx.start.line, "Function " + fname + " does not exist")
-        LLVMGenerator.call_function(fname)
+        if ctx.params is not None:
+            params = []
+            types = []
+            for param in ctx.params.value():
+                if param.ID() is not None:
+                    params.append("%" + param.ID().getText())
+                    types.append(self.variables[param.ID().getText()])
+                elif param.number() is not None:
+                    if param.number().INT() is not None:
+                        params.append(param.number().INT().getText())
+                        types.append("int")
+                    elif param.number().REAL() is not None:
+                        params.append(param.number().REAL().getText())
+                        types.append("float")
+                elif param.STRING() is not None:
+                    params.append(param.STRING().getText()[1:-1])
+                    types.append("str")
+            LLVMGenerator.call_function_params(fname, params, self.functions[fname])
+        else:
+            LLVMGenerator.call_function(fname)
             
     # TODO functions to return value
-    # TODO functions with parameters 
 
     def exitProg(self, ctx:LangParser.ProgContext):
         with open("output.ll", "w") as f:
